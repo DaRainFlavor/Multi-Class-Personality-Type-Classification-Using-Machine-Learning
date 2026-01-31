@@ -1,0 +1,85 @@
+================================================================================
+RANDOM FOREST EVALUATION REPORT
+16 Personality Types (MBTI) Classification
+================================================================================
+
+CONFIGURATION
+----------------------------------------
+Random State: 42
+Data Split: 70% Train / 15% Validation / 15% Test
+Total Samples: 59,999
+Training Samples: 42,023
+Validation Samples: 8,976
+Test Samples: 9,000
+
+RANDOM FOREST HYPERPARAMETERS
+----------------------------------------
+n_estimators: 100
+max_depth: 20
+min_samples_split: 5
+min_samples_leaf: 2
+max_features: sqrt
+random_state: 42
+n_jobs: -1
+n_trees (actual): 100
+
+ACCURACY SCORES
+----------------------------------------
+Training Accuracy:   0.9934 (99.34%)
+Validation Accuracy: 0.9748 (97.48%)
+Test Accuracy:       0.9757 (97.57%)
+
+TOP-K ACCURACY (Test Set)
+----------------------------------------
+Top-1 Accuracy: 0.9757 (97.57%)
+Top-2 Accuracy: 0.9877 (98.77%)
+Top-3 Accuracy: 0.9908 (99.08%)
+Top-5 Accuracy: 0.9928 (99.28%)
+
+CLASSIFICATION REPORT (Test Set)
+--------------------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+        ENFJ     0.9668    0.9858    0.9762       562
+        ENFP     0.9770    0.9770    0.9770       564
+        ENTJ     0.9735    0.9840    0.9787       561
+        ENTP     0.9788    0.9823    0.9805       564
+        ESFJ     0.9890    0.9609    0.9747       562
+        ESFP     0.9824    0.9876    0.9850       565
+        ESTJ     0.9839    0.9752    0.9795       564
+        ESTP     0.9754    0.9875    0.9814       562
+        INFJ     0.9733    0.9681    0.9707       564
+        INFP     0.9648    0.9786    0.9716       560
+        INTJ     0.9682    0.9751    0.9716       562
+        INTP     0.9664    0.9733    0.9698       561
+        ISFJ     0.9872    0.9661    0.9766       561
+        ISFP     0.9691    0.9502    0.9596       562
+        ISTJ     0.9856    0.9751    0.9804       563
+        ISTP     0.9702    0.9840    0.9771       563
+
+    accuracy                         0.9757      9000
+   macro avg     0.9757    0.9757    0.9757      9000
+weighted avg     0.9757    0.9757    0.9757      9000
+
+TOP 20 IMPORTANT FEATURES (by Random Forest importance)
+--------------------------------------------------------------------------------
+ 1. [0.0277] You are prone to worrying that things will take a turn for the worse.
+ 2. [0.0276] You often end up doing things at the last possible moment.
+ 3. [0.0267] You enjoy going to art museums.
+ 4. [0.0266] Your happiness comes more from helping others accomplish things than your own accomplishments.
+ 5. [0.0264] Your mood can change very quickly.
+ 6. [0.0259] You find it easy to empathize with a person whose experiences are very different from yours.
+ 7. [0.0257] You like to have a to-do list for each day.
+ 8. [0.0256] You are not too interested in discussing various interpretations and analyses of creative works.
+ 9. [0.0254] At social events, you rarely try to introduce yourself to new people and mostly talk to the ones you already know
+10. [0.0253] You feel more drawn to places with busy, bustling atmospheres than quiet, intimate places.
+11. [0.0251] You are more inclined to follow your head than your heart.
+12. [0.0250] You often feel overwhelmed.
+13. [0.0248] You usually prefer just doing what you feel like at any given moment instead of planning a particular daily routine.
+14. [0.0248] You have always been fascinated by the question of what, if anything, happens after death.
+15. [0.0245] You rarely worry about whether you make a good impression on people you meet.
+16. [0.0243] You often have a hard time understanding other people’s feelings.
+17. [0.0243] You struggle with deadlines.
+18. [0.0239] You are still bothered by mistakes that you made a long time ago.
+19. [0.0239] Seeing other people cry can easily make you feel like you want to cry too
+20. [0.0238] You avoid making phone calls.

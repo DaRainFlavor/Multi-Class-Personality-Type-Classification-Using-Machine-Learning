@@ -1,0 +1,83 @@
+================================================================================
+LINEAR DISCRIMINANT ANALYSIS (LDA) EVALUATION REPORT
+16 Personality Types (MBTI) Classification
+================================================================================
+
+CONFIGURATION
+----------------------------------------
+Random State: 42
+Data Split: 70% Train / 15% Validation / 15% Test
+Total Samples: 59,999
+Training Samples: 42,023
+Validation Samples: 8,976
+Test Samples: 9,000
+
+LDA HYPERPARAMETERS
+----------------------------------------
+solver: svd
+n_components: None
+store_covariance: False
+tol: 0.0001
+n_components (used): 15
+explained_variance_ratio (first 5): [0.1478, 0.1324, 0.1181, 0.1022, 0.0944]
+
+ACCURACY SCORES
+----------------------------------------
+Training Accuracy:   0.9053 (90.53%)
+Validation Accuracy: 0.9063 (90.63%)
+Test Accuracy:       0.9056 (90.56%)
+
+TOP-K ACCURACY (Test Set)
+----------------------------------------
+Top-1 Accuracy: 0.9056 (90.56%)
+Top-2 Accuracy: 0.9644 (96.44%)
+Top-3 Accuracy: 0.9814 (98.14%)
+Top-5 Accuracy: 0.9901 (99.01%)
+
+CLASSIFICATION REPORT (Test Set)
+--------------------------------------------------------------------------------
+              precision    recall  f1-score   support
+
+        ENFJ     0.9133    0.9181    0.9157       562
+        ENFP     0.9274    0.9291    0.9283       564
+        ENTJ     0.9304    0.9537    0.9419       561
+        ENTP     0.9418    0.9468    0.9443       564
+        ESFJ     0.8504    0.7989    0.8239       562
+        ESFP     0.9380    0.9646    0.9511       565
+        ESTJ     0.9228    0.9326    0.9277       564
+        ESTP     0.9232    0.9413    0.9322       562
+        INFJ     0.9207    0.8848    0.9024       564
+        INFP     0.9132    0.9018    0.9075       560
+        INTJ     0.8495    0.9039    0.8759       562
+        INTP     0.8852    0.9073    0.8961       561
+        ISFJ     0.8799    0.8485    0.8639       561
+        ISFP     0.9069    0.8665    0.8863       562
+        ISTJ     0.9083    0.8970    0.9026       563
+        ISTP     0.8763    0.8934    0.8848       563
+
+    accuracy                         0.9056      9000
+   macro avg     0.9055    0.9055    0.9053      9000
+weighted avg     0.9055    0.9056    0.9053      9000
+
+TOP 20 IMPORTANT FEATURES (by LDA coefficient magnitude)
+--------------------------------------------------------------------------------
+ 1. [0.6400] Your mood can change very quickly.
+ 2. [0.6293] You are not too interested in discussing various interpretations and analyses of creative works.
+ 3. [0.6187] You often end up doing things at the last possible moment.
+ 4. [0.6132] You find it easy to empathize with a person whose experiences are very different from yours.
+ 5. [0.6072] You are prone to worrying that things will take a turn for the worse.
+ 6. [0.6049] You rarely worry about whether you make a good impression on people you meet.
+ 7. [0.5970] You like to have a to-do list for each day.
+ 8. [0.5865] You have always been fascinated by the question of what, if anything, happens after death.
+ 9. [0.5806] Your happiness comes more from helping others accomplish things than your own accomplishments.
+10. [0.5789] You often make a backup plan for a backup plan.
+11. [0.5721] You enjoy going to art museums.
+12. [0.5453] You often feel overwhelmed.
+13. [0.5439] You feel comfortable just walking up to someone you find interesting and striking up a conversation.
+14. [0.5397] You enjoy watching people argue.
+15. [0.5350] You are definitely not an artistic type of person.
+16. [0.5238] You are still bothered by mistakes that you made a long time ago.
+17. [0.5191] You would pass along a good opportunity if you thought someone else needed it more.
+18. [0.5161] At social events, you rarely try to introduce yourself to new people and mostly talk to the ones you already know
+19. [0.5110] You feel more drawn to places with busy, bustling atmospheres than quiet, intimate places.
+20. [0.5069] You like books and movies that make you come up with your own interpretation of the ending.
