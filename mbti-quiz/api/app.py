@@ -39,6 +39,7 @@ load_model()
 
 
 @app.route('/health', methods=['GET'])
+@app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
     return jsonify({
@@ -48,6 +49,7 @@ def health_check():
 
 
 @app.route('/predict', methods=['POST'])
+@app.route('/api/predict', methods=['POST'])
 def predict():
     """Predict MBTI personality type from quiz answers"""
     if ort_session is None or class_labels is None:
@@ -132,6 +134,7 @@ def predict():
 
 
 @app.route('/types', methods=['GET'])
+@app.route('/api/types', methods=['GET'])
 def get_types():
     """Get all possible personality types"""
     if class_labels is None:
