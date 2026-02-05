@@ -209,8 +209,9 @@ export default function QuizPage() {
                             Q{currentQuestion + 1}/{questions.length}
                         </span>
                     </div>
-                    <div className="text-xs md:text-sm text-[#C4A52D] font-bold">
-                        {answeredCount}/{questions.length} Answered
+                    <div className="text-xs md:text-sm text-[#C4A52D] font-bold flex flex-col items-end">
+                        <span>{answeredCount}/{questions.length} Answered</span>
+                        <span className="text-[10px] text-white/50 font-normal">v1.1</span>
                     </div>
                 </div>
             </header>
