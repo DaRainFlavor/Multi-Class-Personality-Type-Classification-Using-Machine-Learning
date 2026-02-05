@@ -143,16 +143,17 @@ export default function QuizPage() {
             });
 
             if (!response.ok) {
-                const errData = await response.json().catch(() => ({}));
+                const errData = (await response.json().catch(() => ({}))) as { error?: string };
                 throw new Error(errData.error || "Failed to get prediction");
             }
 
             const data = await response.json();
             sessionStorage.setItem("quizResult", JSON.stringify(data));
             router.push("/results");
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error submitting quiz:", error);
-            alert(`Failed to submit quiz: ${error.message || "Unknown error"}`);
+            const errorMessage = error instanceof Error ? error.message : "Unknown error";
+            alert(`Failed to submit quiz: ${errorMessage}`);
             setIsSubmitting(false);
         }
     };

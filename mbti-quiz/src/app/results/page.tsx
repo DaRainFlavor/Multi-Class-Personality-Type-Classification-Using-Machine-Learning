@@ -24,10 +24,13 @@ export default function ResultsPage() {
         }
 
         const parsedResult = JSON.parse(storedResult) as QuizResult;
-        setResult(parsedResult);
 
-        const personalityData = getPersonalityType(parsedResult.predicted_type);
-        setPersonality(personalityData || null);
+        // Use requestAnimationFrame to avoid synchronous state update warning in effect
+        requestAnimationFrame(() => {
+            setResult(parsedResult);
+            const personalityData = getPersonalityType(parsedResult.predicted_type);
+            setPersonality(personalityData || null);
+        });
     }, [router]);
 
     if (!result || !personality) {
