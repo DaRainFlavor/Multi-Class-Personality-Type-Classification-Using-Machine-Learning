@@ -142,14 +142,17 @@ export default function QuizPage() {
                 body: JSON.stringify({ answers }),
             });
 
-            if (!response.ok) throw new Error("Failed to get prediction");
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || "Failed to get prediction");
+            }
 
             const data = await response.json();
             sessionStorage.setItem("quizResult", JSON.stringify(data));
             router.push("/results");
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error submitting quiz:", error);
-            alert("Failed to submit quiz. Make sure the API is running.");
+            alert(`Failed to submit quiz: ${error.message || "Unknown error"}`);
             setIsSubmitting(false);
         }
     };

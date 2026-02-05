@@ -15,24 +15,47 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend requests
 
 # Load the model and label encoder
-MODEL_PATH = os.path.join(os.path.dirname(__file__), 'mbti_model.onnx')
-LABELS_PATH = os.path.join(os.path.dirname(__file__), 'labels.json')
+# Vercel file system can be tricky. We need to be robust.
+MODEL_FILENAME = 'mbti_model.onnx'
+LABELS_FILENAME = 'labels.json'
+MODEL_PATH = os.path.join(os.path.dirname(__file__), MODEL_FILENAME)
+LABELS_PATH = os.path.join(os.path.dirname(__file__), LABELS_FILENAME)
 
 ort_session = None
 class_labels = None
+init_error = None
 
 def load_model():
-    global ort_session, class_labels
+    global ort_session, class_labels, init_error
     try:
-        ort_session = ort.InferenceSession(MODEL_PATH)
-        with open(LABELS_PATH, 'r') as f:
+        # Check if files exist
+        if not os.path.exists(MODEL_PATH):
+            # Try looking in current working directory
+             cwd_model = os.path.join(os.getcwd(), 'api', MODEL_FILENAME)
+             if os.path.exists(cwd_model):
+                 # Update paths
+                 real_model_path = cwd_model
+                 real_labels_path = os.path.join(os.getcwd(), 'api', LABELS_FILENAME)
+             else:
+                 # Debug info: List files in current directory and dirname
+                 debug_info = {
+                     "cwd": os.getcwd(),
+                     "dirname": os.path.dirname(__file__),
+                     "cwd_files": os.listdir(os.getcwd()),
+                     "dirname_files": os.listdir(os.path.dirname(__file__)) if os.path.exists(os.path.dirname(__file__)) else "Dir not found"
+                 }
+                 raise FileNotFoundError(f"Model file not found at {MODEL_PATH}. Debug: {debug_info}")
+        else:
+            real_model_path = MODEL_PATH
+            real_labels_path = LABELS_PATH
+
+        ort_session = ort.InferenceSession(real_model_path)
+        with open(real_labels_path, 'r') as f:
             class_labels = json.load(f)
         print("Model and labels loaded successfully!")
-        print(f"Classes: {class_labels}")
     except Exception as e:
         print(f"Error loading model: {e}")
-        print(f"Expected model at: {MODEL_PATH}")
-        print(f"Expected labels at: {LABELS_PATH}")
+        init_error = str(e)
 
 # Load model immediately when module is imported
 load_model()
@@ -54,7 +77,7 @@ def predict():
     """Predict MBTI personality type from quiz answers"""
     if ort_session is None or class_labels is None:
         return jsonify({
-            'error': 'Model not loaded.'
+            'error': f'Model not loaded. Init Error: {init_error}'
         }), 500
 
     try:
