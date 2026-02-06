@@ -119,12 +119,10 @@ function QuizContent() {
 
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.ctrlKey) {
-                if (e.key === "ArrowLeft") {
-                    goToPrevious();
-                } else if (e.key === "ArrowRight") {
-                    goToNext();
-                }
+            if (e.key === "ArrowLeft") {
+                goToPrevious();
+            } else if (e.key === "ArrowRight") {
+                goToNext();
             } else {
                 const key = parseInt(e.key);
                 if (!isNaN(key) && key >= 1 && key <= 7) {
