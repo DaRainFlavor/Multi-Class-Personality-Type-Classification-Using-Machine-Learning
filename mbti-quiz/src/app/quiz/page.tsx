@@ -1,8 +1,14 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { questions, answerOptions } from "@/data/questions";
+import React, { useState, useRef, useEffect, useCallback, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { questions as allQuestions, answerOptions } from "@/data/questions";
+
+// Short question indices (0-indexed) from top_35_questions.json
+const SHORT_QUESTION_INDICES = [
+    11, 5, 36, 19, 38, 12, 28, 13, 17, 37, 26, 52, 3, 14, 54,
+    21, 29, 4, 25, 57, 32, 58, 2, 40, 10, 35, 34, 24, 44, 18, 16, 42, 15, 8, 59
+];
 
 const getPositionFromValue = (value: number | null) => {
     if (value === null) return null;
@@ -13,18 +19,29 @@ const getValueFromPosition = (position: number) => {
     return position - 3;
 };
 
-export default function QuizPage() {
+function QuizContent() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const mode = searchParams.get('mode') || 'full';
+    const isShortMode = mode === 'short';
+
+    // Get questions based on mode
+    const questions = isShortMode
+        ? SHORT_QUESTION_INDICES.map(idx => allQuestions[idx])
+        : allQuestions;
+
+    const totalQuestions = questions.length;
+
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [answers, setAnswers] = useState<(number | null)[]>(
-        new Array(questions.length).fill(null)
+        new Array(totalQuestions).fill(null)
     );
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isDragging, setIsDragging] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const sliderRef = useRef<HTMLDivElement>(null);
 
-    const progress = ((currentQuestion + 1) / questions.length) * 100;
+    const progress = ((currentQuestion + 1) / totalQuestions) * 100;
     const currentAnswer = answers[currentQuestion];
 
     const handleAnswer = useCallback((value: number) => {
@@ -89,10 +106,10 @@ export default function QuizPage() {
     }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove]);
 
     const goToNext = useCallback(() => {
-        if (currentQuestion < questions.length - 1) {
+        if (currentQuestion < totalQuestions - 1) {
             setCurrentQuestion((prev) => prev + 1);
         }
-    }, [currentQuestion]);
+    }, [currentQuestion, totalQuestions]);
 
     const goToPrevious = useCallback(() => {
         if (currentQuestion > 0) {
@@ -139,7 +156,10 @@ export default function QuizPage() {
             const response = await fetch(apiUrl, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ answers }),
+                body: JSON.stringify({
+                    answers,
+                    mode: isShortMode ? 'short' : 'full'
+                }),
             });
 
             if (!response.ok) {
@@ -147,13 +167,12 @@ export default function QuizPage() {
                 const statusText = response.statusText;
                 const responseText = await response.text();
 
-                // Try to parse as JSON if possible to get "error" field
                 try {
                     const jsonErr = JSON.parse(responseText);
                     if (jsonErr.error) {
                         throw new Error(jsonErr.error);
                     }
-                } catch (e) {
+                } catch {
                     // Ignore json parse error, use raw text
                 }
 
@@ -177,7 +196,7 @@ export default function QuizPage() {
     };
 
     const answeredCount = answers.filter((a) => a !== null).length;
-    const isLastQuestion = currentQuestion === questions.length - 1;
+    const isLastQuestion = currentQuestion === totalQuestions - 1;
     const currentPosition = getPositionFromValue(currentAnswer);
 
     const isLongText = questions[currentQuestion].text.length > 80;
@@ -192,17 +211,17 @@ export default function QuizPage() {
                 />
             </div>
 
-            {/* Header - Darker Background (Burgundy) */}
-            <header className="fixed top-0 left-0 right-0 p-3 md:p-4 z-40 bg-[#8B1538] border-b-2 border-[#C4A52D] shadow-md">
-                <div className="max-w-6xl mx-auto flex items-center justify-between">
-                    <div className="flex items-center gap-2 md:gap-4">
-                        {/* Hamburger Menu Button - Mobile Only - White outline since bg is burgundy */}
+            {/* Header */}
+            <header className="fixed top-0 left-0 right-0 py-3 pr-3 pl-0 md:py-4 md:pr-4 md:pl-0 z-40 bg-[#8B1538] border-b-2 border-[#C4A52D] shadow-md">
+                <div className="flex items-center justify-between pl-4 md:pl-6 pr-2 md:pr-4">
+                    <div className="flex items-center gap-3 md:gap-5">
+                        {/* Hamburger Menu Button */}
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className="lg:hidden p-2 rounded-lg bg-white/10 text-white hover:bg-white/20 transition-all"
                             aria-label="Toggle questions menu"
                         >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 {isMenuOpen ? (
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                                 ) : (
@@ -213,18 +232,22 @@ export default function QuizPage() {
 
                         <button
                             onClick={() => router.push("/")}
-                            className="text-white hover:text-[#C4A52D] font-medium transition-colors text-sm md:text-base flex items-center gap-1"
+                            className="text-white hover:text-[#C4A52D] font-semibold transition-colors text-base md:text-lg flex items-center gap-2"
                         >
                             <span>←</span> <span className="hidden xs:inline">Back</span>
                         </button>
-                        <span className="text-[#C4A52D] hidden md:inline">|</span>
-                        <span className="text-xs md:text-sm text-[#E8E5DC] font-medium">
-                            Q{currentQuestion + 1}/{questions.length}
+                        <span className="text-[#C4A52D] hidden md:inline text-lg">|</span>
+                        <span className="text-sm md:text-base text-[#E8E5DC] font-semibold">
+                            Q{currentQuestion + 1}/{totalQuestions}
                         </span>
+                        {isShortMode && (
+                            <span className="text-xs md:text-sm bg-[#4A7C7C] text-white px-3 py-1 rounded-full font-medium">
+                                Quick
+                            </span>
+                        )}
                     </div>
-                    <div className="text-xs md:text-sm text-[#C4A52D] font-bold flex flex-col items-end">
-                        <span>{answeredCount}/{questions.length} Answered</span>
-                        <span className="text-[10px] text-white/50 font-normal">v1.3-fix</span>
+                    <div className="text-sm md:text-base text-[#C4A52D] font-bold">
+                        {answeredCount}/{totalQuestions} Answered
                     </div>
                 </div>
             </header>
@@ -273,12 +296,12 @@ export default function QuizPage() {
                     <div className="pt-4 border-t border-[#E8E5DC]">
                         <div className="flex justify-between text-xs text-[#4A7C7C]">
                             <span>Progress</span>
-                            <span className="font-bold text-[#8B1538]">{answeredCount}/60</span>
+                            <span className="font-bold text-[#8B1538]">{answeredCount}/{totalQuestions}</span>
                         </div>
                         <div className="mt-2 h-2 bg-[#E8E5DC] rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-[#4A7C7C] transition-all duration-300"
-                                style={{ width: `${(answeredCount / 60) * 100}%` }}
+                                style={{ width: `${(answeredCount / totalQuestions) * 100}%` }}
                             />
                         </div>
                     </div>
@@ -286,15 +309,18 @@ export default function QuizPage() {
             </div>
 
             {/* Main content with side panel */}
-            <div className="pt-20 md:pt-24 pb-0 px-3 md:px-4 lg:ml-72 h-full">
+            <div className="pt-20 md:pt-24 pb-0 px-3 md:px-4 lg:ml-80 h-full">
                 <div className="max-w-4xl mx-auto h-full flex flex-col">
 
-                    {/* Left side - Question Navigator (Desktop Only - Fixed Sidebar) */}
-                    <div className="hidden lg:block fixed left-0 top-0 bottom-0 w-72 bg-white border-r-2 border-[#E8E5DC] pt-24 pb-8 px-6 overflow-y-auto z-30 shadow-lg">
+                    {/* Left side - Question Navigator (Desktop Only) */}
+                    <div className="hidden lg:block fixed left-0 top-0 bottom-0 w-80 bg-white border-r-2 border-[#E8E5DC] pt-24 pb-8 px-6 overflow-y-auto z-30 shadow-lg">
                         <div className="flex flex-col h-full">
                             <p className="text-lg text-[#8B1538] font-bold mb-6 flex items-center gap-2">
                                 <span>Questions</span>
-                                <span className="text-xs bg-[#E8E5DC] text-[#2C2C2C] px-2 py-1 rounded-full">{answeredCount}/60</span>
+                                <span className="text-xs bg-[#E8E5DC] text-[#2C2C2C] px-2 py-1 rounded-full">{answeredCount}/{totalQuestions}</span>
+                                {isShortMode && (
+                                    <span className="text-xs bg-[#4A7C7C] text-white px-2 py-1 rounded-full">Quick</span>
+                                )}
                             </p>
 
                             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -319,12 +345,12 @@ export default function QuizPage() {
                             <div className="mt-6 pt-6 border-t border-[#E8E5DC]">
                                 <div className="flex justify-between text-xs text-[#4A7C7C] mb-2">
                                     <span>Progress</span>
-                                    <span className="font-bold">{Math.round((answeredCount / 60) * 100)}%</span>
+                                    <span className="font-bold">{Math.round((answeredCount / totalQuestions) * 100)}%</span>
                                 </div>
                                 <div className="h-2 bg-[#E8E5DC] rounded-full overflow-hidden">
                                     <div
                                         className="h-full bg-[#4A7C7C] transition-all duration-300"
-                                        style={{ width: `${(answeredCount / 60) * 100}%` }}
+                                        style={{ width: `${(answeredCount / totalQuestions) * 100}%` }}
                                     />
                                 </div>
                             </div>
@@ -348,19 +374,16 @@ export default function QuizPage() {
                             </div>
                         </div>
 
-                        {/* Slider - No Container */}
+                        {/* Slider */}
                         <div className="px-2 md:px-8 py-2 md:py-4 relative shrink-0">
-                            {/* Draggable Slider Track */}
                             <div
                                 ref={sliderRef}
                                 className="relative h-12 cursor-pointer select-none touch-none"
                                 onMouseDown={handleMouseDown}
                                 onTouchStart={handleTouchStart}
                             >
-                                {/* Background line */}
                                 <div className="absolute top-1/2 left-0 right-0 h-2 bg-[#E8E5DC] rounded-full -translate-y-1/2" />
 
-                                {/* Filled/Highlighted line */}
                                 {currentPosition !== null && (
                                     <div
                                         className="absolute top-1/2 left-0 h-2 bg-[#8B1538] rounded-full -translate-y-1/2 transition-all duration-150"
@@ -368,7 +391,6 @@ export default function QuizPage() {
                                     />
                                 )}
 
-                                {/* Dots/Points */}
                                 <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 flex justify-between">
                                     {answerOptions.map((option, index) => (
                                         <button
@@ -388,7 +410,6 @@ export default function QuizPage() {
                                 </div>
                             </div>
 
-                            {/* Labels below dots */}
                             <div className="flex justify-between mt-3 px-0 select-none">
                                 {answerOptions.map((option, index) => (
                                     <button
@@ -405,7 +426,7 @@ export default function QuizPage() {
                             </div>
                         </div>
 
-                        {/* Navigation Buttons - Below Slider */}
+                        {/* Navigation Buttons */}
                         <div className="flex items-center justify-between mt-4 px-2 md:px-4 shrink-0">
                             <button
                                 onClick={goToPrevious}
@@ -442,5 +463,17 @@ export default function QuizPage() {
                 </div>
             </div>
         </main>
+    );
+}
+
+export default function QuizPage() {
+    return (
+        <Suspense fallback={
+            <div className="h-screen bg-[#F5F2E8] flex items-center justify-center">
+                <div className="text-[#8B1538] text-xl font-bold">Loading quiz...</div>
+            </div>
+        }>
+            <QuizContent />
+        </Suspense>
     );
 }
