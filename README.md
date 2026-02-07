@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="https://mbti-synthetic.vercel.app"><img src="https://img.shields.io/badge/Live_Demo-mbti--synthetic.vercel.app-blue?style=for-the-badge" alt="Live Demo"/></a>
-  <a href="https://docs.google.com/document/d/1w2i_RzOH-aMBuf_VseDQ_QhSqrSA5ZATzRTOSJ3s4xI/edit?usp=sharing"><img src="https://img.shields.io/badge/Full_Documentation-Google_Drive-4285F4?style=for-the-badge" alt="Documentation"/></a>
+  <a href="https://drive.google.com/drive/u/3/folders/1izn04Xh0_E5oYoFPaypThqST6e3405IT"><img src="https://img.shields.io/badge/Full_Documentation-Google_Drive-4285F4?style=for-the-badge" alt="Documentation"/></a>
 </p>
 
 ---
